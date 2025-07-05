@@ -35,7 +35,7 @@ class PaymentController extends Controller
             $converted_amount = ($amount / $system_currency->conversion_rate) * $to_currency->conversion_rate;
             return round($converted_amount, $decimal_point);
         }
-//        throw new CurrencyException("Currency error. $convert_to_currency currency is not configured.");
+        throw new CurrencyException("Currency error. $convert_to_currency currency is not configured.");
     }
     /**
      * Order payment process

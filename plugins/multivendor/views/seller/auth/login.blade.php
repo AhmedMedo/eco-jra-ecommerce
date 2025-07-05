@@ -38,7 +38,7 @@
 
         .bg-image {
             height: 100vh;
-            background-image: url('web-assets/backend/img/log-in-bg.jpg');
+            background-image: url('{{ asset('web-assets/backend/img/log-in-bg.jpg') }}');
         }
     </style>
 @endsection
