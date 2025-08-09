@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -30,8 +32,30 @@ class UserSeeder extends Seeder
         $superAdmin->uid = 'SUPER-ADMIN-' . $superAdmin->id . now()->format('ymd');
         $superAdmin->update();
 
+        // Create test seller
+        if (!\Core\Models\User::where('user_type', 3)->where('email', 'seller@example.com')->first()) {
+            $date = now();
+            $user_id = $date->format('y') . $date->format('m') . $date->format('d');
+            
+            $seller = new \Core\Models\User();
+            $seller->name = 'Test Seller';
+            $seller->email = 'seller@example.com';
+            $seller->user_type = 3; // seller
+            $seller->status = 1; // active
+            $seller->password = \Illuminate\Support\Facades\Hash::make('password');
+            $seller->saveOrFail();
+            $seller->uid = "SELLER-" . $seller->id . $user_id;
+            $seller->update();
 
-
+            // Create seller shop
+            $seller_shop = new \Plugin\Multivendor\Models\SellerShop();
+            $seller_shop->seller_id = $seller->id;
+            $seller_shop->seller_phone = '+1234567890';
+            $seller_shop->shop_name = 'Test Shop';
+            $seller_shop->shop_slug = Str::slug('test-shop');
+            $seller_shop->shop_phone = '+1234567890';
+            $seller_shop->status = 1; // active
+            $seller_shop->save();
+        }
     }
-
 }
