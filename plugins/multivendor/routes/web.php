@@ -149,3 +149,28 @@ Route::group(['prefix' => 'seller'], function () {
         Route::get('earning', [EarningController::class, 'sellerEarnings'])->name('plugin.multivendor.seller.dashboard.earning.history');
     });
 });
+
+/**
+ * Seller v2 (new UI) - lives alongside old seller without interference
+ */
+Route::group(['prefix' => 'seller/v2'], function () {
+    // Public auth pages
+    Route::get('/login', [\Plugin\Multivendor\Http\Controllers\Seller\V2\AuthController::class, 'login'])
+        ->name('plugin.multivendor.seller.v2.login');
+    Route::post('/login-attempt', [\Plugin\Multivendor\Http\Controllers\Seller\V2\AuthController::class, 'loginAttempt'])
+        ->name('plugin.multivendor.seller.v2.login.attempt');
+
+    // Protected pages
+    Route::middleware('auth.seller')->group(function () {
+        Route::get('/dashboard', [\Plugin\Multivendor\Http\Controllers\Seller\V2\PageController::class, 'dashboard'])
+            ->name('plugin.multivendor.seller.v2.dashboard');
+        Route::get('/marketplace', [\Plugin\Multivendor\Http\Controllers\Seller\V2\PageController::class, 'marketplace'])
+            ->name('plugin.multivendor.seller.v2.marketplace');
+        Route::get('/certificates', [\Plugin\Multivendor\Http\Controllers\Seller\V2\PageController::class, 'certificates'])
+            ->name('plugin.multivendor.seller.v2.certificates');
+        Route::get('/reports', [\Plugin\Multivendor\Http\Controllers\Seller\V2\PageController::class, 'reports'])
+            ->name('plugin.multivendor.seller.v2.reports');
+        Route::get('/settings', [\Plugin\Multivendor\Http\Controllers\Seller\V2\PageController::class, 'settings'])
+            ->name('plugin.multivendor.seller.v2.settings');
+    });
+});
