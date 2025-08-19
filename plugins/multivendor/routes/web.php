@@ -174,3 +174,31 @@ Route::group(['prefix' => 'seller/v2'], function () {
             ->name('plugin.multivendor.seller.v2.settings');
     });
 });
+
+Route::group(['prefix' => 'buyer'], function () {
+    // Public auth pages
+    Route::get('/login', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'login'])
+        ->name('plugin.multivendor.buyer.v2.login');
+    Route::post('/login-attempt', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'loginAttempt'])
+        ->name('plugin.multivendor.buyer.v2.login.attempt');
+    Route::get('/register', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'register'])
+        ->name('plugin.multivendor.buyer.v2.register');
+
+    // Protected pages
+    Route::middleware('auth')->group(function () {
+        Route::get('/dashboard', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'dashboard'])
+            ->name('plugin.multivendor.buyer.v2.dashboard');
+        Route::get('/marketplace', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'marketplace'])
+            ->name('plugin.multivendor.buyer.v2.marketplace');
+        Route::get('/marketplace/project/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'projectDetail'])
+            ->name('plugin.multivendor.buyer.v2.project-detail');
+        Route::get('/certificates', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'certificates'])
+            ->name('plugin.multivendor.buyer.v2.certificates');
+        Route::get('/reports', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'reports'])
+            ->name('plugin.multivendor.buyer.v2.reports');
+        Route::get('/settings', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'settings'])
+            ->name('plugin.multivendor.buyer.v2.settings');
+        Route::get('/account-review', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'accountReview'])
+            ->name('plugin.multivendor.buyer.v2.account-review');
+    });
+});

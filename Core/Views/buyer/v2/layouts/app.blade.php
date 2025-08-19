@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@yield('title', 'Buyer v2')</title>
+
+    <!-- Tailwind (scoped to v2 layout only) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-teal': '#14b8a6',
+                        'primary-teal-dark': '#0f766e',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Alpine.js for light interactivity -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Scoped helpers to avoid global leakage */
+        #buyer-v2-app {
+            --brand-teal: #167070;
+            --brand-teal-dark: #0f5050;
+            --brand-orange: #fe6625;
+            --brand-orange-light: #fb9335;
+            --brand-white: #ffffff;
+            --brand-beige: #c19f7a;
+            --brand-navy: #013f59;
+        }
+        #buyer-v2-app .sidebar-gradient {
+            background: linear-gradient(180deg, var(--brand-teal) 0%, var(--brand-navy) 100%);
+        }
+        #buyer-v2-app .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        #buyer-v2-app .status-active { background-color: #dcfce7; color: #166534; }
+        #buyer-v2-app .status-inactive { background-color: #fef9c3; color: #854d0e; }
+        #buyer-v2-app .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        #buyer-v2-app .btn-primary { background:#167070; color:#fff; padding:0.5rem 1rem; border-radius:0.5rem; font-weight:600; }
+        #buyer-v2-app .btn-primary:hover { background:#0f5050; }
+        #buyer-v2-app .btn-secondary { background:#f3f4f6; color:#374151; padding:0.5rem 1rem; border-radius:0.5rem; font-weight:600; }
+        #buyer-v2-app .btn-secondary:hover { background:#e5e7eb; }
+        #buyer-v2-app .table-header { background:#f9fafb; color:#374151; font-weight:600; font-size:0.875rem; }
+        #buyer-v2-app .sidebar-link { display:flex; align-items:center; padding:0.75rem 1rem; color:#fff; border-radius:0.5rem; margin:0.25rem 0.5rem; }
+        #buyer-v2-app .sidebar-link:hover { background: rgba(255,255,255,0.1); }
+        #buyer-v2-app .sidebar-link.active { background: rgba(255,255,255,0.2); }
+    </style>
+
+    @stack('head')
+    @yield('head')
+    @stack('css')
+</head>
+<body class="bg-gray-50">
+<div id="buyer-v2-app" class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar-gradient w-64 flex flex-col">
+        <div class="flex items-center px-6 py-6 border-b border-white/20">
+            <img src="{{ asset('themes/fashion-theme/images/logo.png') }}" alt="Logo" class="w-8 h-8 mr-3">
+            <h1 class="text-xl font-bold text-white">Ecojarah</h1>
+        </div>
+
+        <nav class="flex-1 py-6">
+            @php
+                $items = [
+                  ['name' => 'Dashboard', 'href' => route('plugin.multivendor.buyer.v2.dashboard')],
+                  ['name' => 'Marketplace', 'href' => route('plugin.multivendor.buyer.v2.marketplace')],
+                  ['name' => 'Certificates', 'href' => route('plugin.multivendor.buyer.v2.certificates')],
+                  ['name' => 'Reports', 'href' => route('plugin.multivendor.buyer.v2.reports')],
+                  ['name' => 'Settings', 'href' => route('plugin.multivendor.buyer.v2.settings')],
+                ];
+            @endphp
+            @foreach ($items as $item)
+                <a href="{{ $item['href'] }}"
+                   class="sidebar-link {{ url()->current() === $item['href'] ? 'active' : '' }}">
+                    <span class="w-5 h-5 mr-3"></span>
+                    {{ $item['name'] }}
+                </a>
+            @endforeach
+        </nav>
+
+        <div class="p-4 border-t border-white/20">
+            <div class="flex items-center">
+                <img class="w-10 h-10 rounded-full" src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100&h=100&fit=crop&crop=face" alt="User">
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-white">{{ auth()->user()->name ?? 'Buyer' }}</p>
+                    <p class="text-xs text-gray-300">Buyer</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Placeholder for header actions -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-auto">
+            @yield('content')
+        </main>
+    </div>
+</div>
+
+@stack('scripts')
+@yield('scripts')
+</body>
+</html>
