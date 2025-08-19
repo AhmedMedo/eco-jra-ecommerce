@@ -31,10 +31,11 @@
         <!-- Left Side - Registration Form -->
         <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
             <div class="max-w-md w-full space-y-8">
+                <!-- Logo -->
+                <div class="flex justify-center mb-6">
+                    <img src="{{ asset('logo/eco-jara-logo.jpeg') }}" alt="Ecojarah" class="w-16 h-16" />
+                </div>
                 <div>
-                    <div class="flex justify-center">
-                        <img class="h-12 w-auto" src="{{ asset('themes/fashion-theme/images/logo.png') }}" alt="Ecojarah">
-                    </div>
                     <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Create your buyer account
                     </h2>
@@ -67,7 +68,7 @@
                     </div>
                 @endif
 
-                <form class="mt-8 space-y-6" action="#" method="POST">
+                <form class="mt-8 space-y-6" action="{{ route('plugin.multivendor.buyer.v2.register.attempt') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
@@ -88,19 +89,19 @@
                         </div>
 
                         <div>
+                            <label for="company_name" class="block text-sm font-medium text-gray-700">Company Name</label>
+                            <input id="company_name" name="company_name" type="text" 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
+                                   placeholder="Company Name"
+                                   value="{{ old('company_name') }}">
+                        </div>
+
+                        <div>
                             <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                             <input id="email" name="email" type="email" autocomplete="email" required 
                                    class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
                                    placeholder="Email address"
                                    value="{{ old('email') }}">
-                        </div>
-
-                        <div>
-                            <label for="company" class="block text-sm font-medium text-gray-700">Company Name (Optional)</label>
-                            <input id="company" name="company" type="text" 
-                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
-                                   placeholder="Company Name"
-                                   value="{{ old('company') }}">
                         </div>
 
                         <div>
@@ -111,25 +112,51 @@
                                    value="{{ old('phone') }}">
                         </div>
 
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input id="password" name="password" type="password" autocomplete="new-password" required 
-                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
-                                   placeholder="Password">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-gray-700">Create Password</label>
+                                <input id="password" name="password" type="password" autocomplete="new-password" required 
+                                       class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
+                                       placeholder="Create Password">
+                            </div>
+                            <div>
+                                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                                <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required 
+                                       class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
+                                       placeholder="Confirm Password">
+                            </div>
                         </div>
 
                         <div>
-                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required 
+                            <label for="vat_number" class="block text-sm font-medium text-gray-700">VAT Registration Number (Optional)</label>
+                            <input id="vat_number" name="vat_number" type="text" 
                                    class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-teal focus:border-primary-teal focus:z-10 sm:text-sm" 
-                                   placeholder="Confirm Password">
+                                   placeholder="VAT Registration Number (Optional)"
+                                   value="{{ old('vat_number') }}">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">KYC Document Upload</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
+                                <div class="flex flex-col items-center space-y-3">
+                                    <svg class="w-10 h-10 text-primary-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                    <p class="text-gray-700 text-sm">Drag and drop your documents here</p>
+                                    <p class="text-gray-500 text-xs">Upload your business license and other required documents for verification.</p>
+                                    <label class="inline-flex items-center justify-center px-4 py-2 bg-primary-teal text-white rounded-lg cursor-pointer hover:bg-primary-teal-dark">
+                                        Browse Files
+                                        <input type="file" name="kyc_files[]" class="hidden" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center">
-                        <input id="terms" name="terms" type="checkbox" required
-                               class="h-4 w-4 text-primary-teal focus:ring-primary-teal border-gray-300 rounded">
-                        <label for="terms" class="ml-2 block text-sm text-gray-900">
+                    <div class="flex items-start space-x-3">
+                        <input id="terms" name="agree" type="checkbox" required
+                               class="mt-1 h-4 w-4 text-primary-teal focus:ring-primary-teal border-gray-300 rounded">
+                        <label for="terms" class="text-sm text-gray-700">
                             I agree to the 
                             <a href="#" class="font-medium text-primary-teal hover:text-primary-teal-dark">Terms of Service</a>
                             and 
@@ -139,12 +166,7 @@
 
                     <div>
                         <button type="submit" 
-                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-teal hover:bg-primary-teal-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-teal">
-                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                <svg class="h-5 w-5 text-primary-teal-dark group-hover:text-primary-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                                </svg>
-                            </span>
+                                class="w-full bg-primary-teal text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary-teal-dark transition-colors duration-200">
                             Create Account
                         </button>
                     </div>

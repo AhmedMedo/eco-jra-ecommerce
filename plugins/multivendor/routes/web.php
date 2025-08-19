@@ -183,9 +183,52 @@ Route::group(['prefix' => 'buyer'], function () {
         ->name('plugin.multivendor.buyer.v2.login.attempt');
     Route::get('/register', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'register'])
         ->name('plugin.multivendor.buyer.v2.register');
+    Route::post('/register', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'registerAttempt'])
+        ->name('plugin.multivendor.buyer.v2.register.attempt');
+    
+    // Password reset routes
+    Route::get('/forgot-password', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'showForgotPasswordForm'])
+        ->name('plugin.multivendor.buyer.v2.password.request');
+    Route::post('/forgot-password', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'sendResetLinkEmail'])
+        ->name('plugin.multivendor.buyer.v2.password.email');
+    Route::get('/reset-password/{token}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'showResetForm'])
+        ->name('plugin.multivendor.buyer.v2.password.reset');
+    Route::post('/reset-password', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'resetPassword'])
+        ->name('plugin.multivendor.buyer.v2.password.update');
+    
+    // Standard Laravel password reset routes (required by the system)
+    Route::get('/password/reset', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'showForgotPasswordForm'])
+        ->name('password.request');
+    Route::post('/password/email', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'sendResetLinkEmail'])
+        ->name('password.email');
+    Route::get('/password/reset/{token}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'showResetForm'])
+        ->name('password.reset');
+    Route::post('/password/reset', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'resetPassword'])
+        ->name('password.update');
+    
+    // Email verification routes (Laravel built-in system)
+    Route::get('/email/verify', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'showVerificationNotice'])
+        ->name('verification.notice')
+        ->middleware(['auth', 'throttle:6,1']);
+    Route::get('/email/verify/{id}/{hash}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'verifyEmail'])
+        ->name('verification.verify')
+        ->middleware(['auth', 'signed']);
+    Route::post('/email/verification-notification', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'resendVerificationEmail'])
+        ->name('verification.send')
+        ->middleware(['auth', 'throttle:6,1']);
+    
+    // Custom verification routes for our UI
+    Route::get('/verify-email', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'showVerificationNotice'])
+        ->name('plugin.multivendor.buyer.v2.verification.notice')
+        ->middleware(['auth', 'throttle:6,1']);
+    Route::post('/verify-email/send', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'resendVerificationEmail'])
+        ->name('plugin.multivendor.buyer.v2.verification.send')
+        ->middleware(['auth', 'throttle:6,1']);
 
     // Protected pages
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::post('/logout', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\AuthController::class, 'logout'])
+            ->name('plugin.multivendor.buyer.v2.logout');
         Route::get('/dashboard', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'dashboard'])
             ->name('plugin.multivendor.buyer.v2.dashboard');
         Route::get('/marketplace', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'marketplace'])

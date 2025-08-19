@@ -13,12 +13,14 @@ class CreateTimezonesTable extends Migration
      */
     public function up()
     {
-        Schema::create('timezones', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('offset');
-            $table->string('diff_from_gtm');
-        });
+        if (!Schema::hasTable('timezones')) {
+            Schema::create('timezones', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('offset');
+                $table->string('diff_from_gtm');
+            });
+        }
     }
 
     /**
@@ -28,6 +30,8 @@ class CreateTimezonesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('timezones');
+        if (Schema::hasTable('timezones')) {
+            Schema::dropIfExists('timezones');
+        }
     }
 }

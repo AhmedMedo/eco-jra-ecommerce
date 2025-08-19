@@ -60,7 +60,7 @@
     <!-- Sidebar -->
     <aside class="sidebar-gradient w-64 flex flex-col">
         <div class="flex items-center px-6 py-6 border-b border-white/20">
-            <img src="{{ asset('themes/fashion-theme/images/logo.png') }}" alt="Logo" class="w-8 h-8 mr-3">
+            <img src="{{ asset('logo/eco-jara-logo.jpeg') }}" alt="Logo" class="w-8 h-8 mr-3">
             <h1 class="text-xl font-bold text-white">Ecojarah</h1>
         </div>
 

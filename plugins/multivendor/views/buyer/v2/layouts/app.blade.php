@@ -60,7 +60,7 @@
     <!-- Sidebar -->
     <aside class="sidebar-gradient w-64 flex flex-col">
         <div class="flex items-center px-6 py-6 border-b border-white/20">
-            <img src="{{ asset('themes/fashion-theme/images/logo.png') }}" alt="Logo" class="w-8 h-8 mr-3">
+            <img src="{{ asset('logo/eco-jara-logo.jpeg') }}" alt="Logo" class="w-8 h-8 mr-3">
             <h1 class="text-xl font-bold text-white">Ecojarah</h1>
         </div>
 
@@ -84,11 +84,42 @@
         </nav>
 
         <div class="p-4 border-t border-white/20">
-            <div class="flex items-center">
-                <img class="w-10 h-10 rounded-full" src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100&h=100&fit=crop&crop=face" alt="User">
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-white">{{ auth()->user()->name ?? 'Buyer' }}</p>
-                    <p class="text-xs text-gray-300">Buyer</p>
+            <div class="relative" x-data="{ open: false }">
+                <div class="flex items-center cursor-pointer" @click="open = !open">
+                    <img class="w-10 h-10 rounded-full" src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?w=100&h=100&fit=crop&crop=face" alt="User">
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-white">{{ auth()->user()->name ?? 'Buyer' }}</p>
+                        <p class="text-xs text-gray-300">Buyer</p>
+                    </div>
+                    <svg class="w-4 h-4 ml-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                
+                <!-- Dropdown Menu -->
+                <div x-show="open" 
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50"
+                     @click.away="open = false">
+                    <div class="py-1">
+                        <a href="{{ route('plugin.multivendor.buyer.v2.settings') }}" 
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Profile Settings
+                        </a>
+                        <hr class="my-1">
+                        <form method="POST" action="{{ route('plugin.multivendor.buyer.v2.logout') }}">
+                            @csrf
+                            <button type="submit" 
+                                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                Sign Out
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

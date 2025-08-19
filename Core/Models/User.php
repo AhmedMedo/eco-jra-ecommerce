@@ -11,12 +11,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
     use LogsActivity;
     use Notifiable;
+    use MustVerifyEmailTrait;
 
     protected $table = "tl_users";
 
@@ -29,7 +31,15 @@ class User extends Authenticatable
         'name',
         'email',
         'image',
-        'status'
+        'status',
+        'first_name',
+        'last_name',
+        'company_name',
+        'phone',
+        'vat_number',
+        'account_status',
+        'kyc_notes',
+        'email_verified_at'
     ];
 
     /**
@@ -94,6 +104,48 @@ class User extends Authenticatable
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Get the KYC documents for the user.
+     */
+    public function kycDocuments()
+    {
+        return $this->hasMany(\Plugin\Multivendor\Models\BuyerKycDocument::class, 'user_id');
+    }
+
+    /**
+     * Get the email address that should be used for verification.
+     */
+    public function getEmailForVerification()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Get the route name for the email verification redirect.
+     */
+    public function redirectTo()
+    {
+        return route('plugin.multivendor.buyer.v2.dashboard');
+    }
+
+    /**
+     * Determine if the user has verified their email address.
+     */
+    public function hasVerifiedEmail()
+    {
+        return ! is_null($this->email_verified_at);
+    }
+
+    /**
+     * Mark the given user's email as verified.
+     */
+    public function markEmailAsVerified()
+    {
+        return $this->forceFill([
+            'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
     }
     /**
      * Set activity log data 
