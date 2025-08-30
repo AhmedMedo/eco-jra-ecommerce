@@ -278,11 +278,30 @@
                             </div>
                         </div>
                         
-                        <!-- Action Button -->
-                        <div class="flex justify-end">
-                            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200">
-                                Redeem
-                            </button>
+                        <!-- Quantity and Action Section -->
+                        <div class="space-y-3">
+                            <!-- Quantity Input -->
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-medium text-gray-700">Quantity (MWh):</label>
+                                <input type="number" 
+                                       min="0.01" 
+                                       max="{{ $project->available_quantity_mwh }}" 
+                                       step="0.01" 
+                                       value="1.00" 
+                                       class="quantity-input flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#167070] focus:border-[#167070]">
+                            </div>
+                            
+                            <!-- Action Button -->
+                            <div class="flex justify-end">
+                                <button class="add-to-cart-btn bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center" 
+                                        data-project-id="{{ $project->id }}"
+                                        data-project-name="{{ $project->project_name }}">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2 8m2-8l2-2m0 0V9a2 2 0 114 0v2.93m-6 0l2 2"/>
+                                    </svg>
+                                    Add to Cart
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -696,6 +715,75 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error:', error);
                 showToast('Error deleting filter', 'error');
             });
+        }
+    }
+
+    // ==================== CART FUNCTIONALITY ====================
+    
+    // Add to cart functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-to-cart-btn')) {
+            const button = e.target.closest('.add-to-cart-btn');
+            const projectId = button.dataset.projectId;
+            const projectName = button.dataset.projectName;
+            const quantityInput = button.closest('.space-y-3').querySelector('.quantity-input');
+            const quantity = parseFloat(quantityInput.value);
+            
+            if (!quantity || quantity <= 0) {
+                showToast('Please enter a valid quantity', 'error');
+                return;
+            }
+            
+            // Disable button during request
+            button.disabled = true;
+            button.innerHTML = '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Adding...';
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                             document.querySelector('input[name="_token"]')?.value ||
+                             '{{ csrf_token() }}';
+            
+            fetch('{{ route("plugin.multivendor.buyer.v2.cart.add") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({
+                    project_id: projectId,
+                    quantity_mwh: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`${projectName} added to cart successfully!`);
+                    // Update cart counter if it exists
+                    updateCartCounter(data.cart_summary);
+                    // Reset quantity to 1
+                    quantityInput.value = '1.00';
+                } else {
+                    showToast(data.message || 'Failed to add to cart', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error adding to cart', 'error');
+            })
+            .finally(() => {
+                // Re-enable button
+                button.disabled = false;
+                button.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2 8m2-8l2-2m0 0V9a2 2 0 114 0v2.93m-6 0l2 2"/></svg>Add to Cart';
+            });
+        }
+    });
+    
+    // Function to update cart counter
+    function updateCartCounter(cartSummary) {
+        const cartCounter = document.getElementById('cart-counter');
+        if (cartCounter && cartSummary) {
+            cartCounter.textContent = cartSummary.total_items;
+            cartCounter.classList.remove('hidden');
         }
     }
 });

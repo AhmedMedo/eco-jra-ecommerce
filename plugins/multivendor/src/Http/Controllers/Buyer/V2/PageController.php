@@ -5,14 +5,17 @@ namespace Plugin\Multivendor\Http\Controllers\Buyer\V2;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Plugin\Multivendor\Repositories\IrecProjectRepository;
+use Plugin\Multivendor\Repositories\IrecCartRepository;
 
 class PageController extends Controller
 {
     protected $irecRepository;
+    protected $cartRepository;
 
-    public function __construct(IrecProjectRepository $irecRepository)
+    public function __construct(IrecProjectRepository $irecRepository, IrecCartRepository $cartRepository)
     {
         $this->irecRepository = $irecRepository;
+        $this->cartRepository = $cartRepository;
     }
 
     public function dashboard()
@@ -299,5 +302,117 @@ class PageController extends Controller
         return response()->json([
             'filters' => $savedFilters
         ]);
+    }
+
+    // ==================== CART METHODS ====================
+
+    /**
+     * Add IREC project to cart
+     */
+    public function addToCart(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|integer|exists:tl_multivendor_irec_projects,id',
+            'quantity_mwh' => 'required|numeric|min:0.01',
+        ]);
+
+        $result = $this->cartRepository->addToCart(
+            auth()->id(),
+            $request->project_id,
+            $request->quantity_mwh
+        );
+
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'message' => 'IREC added to cart successfully',
+                'cart_summary' => $this->cartRepository->getCartSummary(auth()->id())
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to add IREC to cart'
+        ], 400);
+    }
+
+    /**
+     * Get cart items for AJAX
+     */
+    public function getCartItems()
+    {
+        $cartItems = $this->cartRepository->getCartItems(auth()->id());
+        $cartSummary = $this->cartRepository->getCartSummary(auth()->id());
+        
+        return response()->json([
+            'cart_items' => $cartItems,
+            'cart_summary' => $cartSummary
+        ]);
+    }
+
+    /**
+     * Update cart item quantity
+     */
+    public function updateCartItem(Request $request)
+    {
+        $request->validate([
+            'uid' => 'required|string',
+            'quantity_mwh' => 'required|numeric|min:0.01',
+        ]);
+
+        $result = $this->cartRepository->updateCartItem(
+            auth()->id(),
+            $request->uid,
+            $request->quantity_mwh
+        );
+
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated successfully',
+                'cart_summary' => $this->cartRepository->getCartSummary(auth()->id())
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update cart'
+        ], 400);
+    }
+
+    /**
+     * Remove item from cart
+     */
+    public function removeCartItem(Request $request)
+    {
+        $request->validate([
+            'uid' => 'required|string',
+        ]);
+
+        $result = $this->cartRepository->removeCartItem(auth()->id(), $request->uid);
+
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed from cart',
+                'cart_summary' => $this->cartRepository->getCartSummary(auth()->id())
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to remove item'
+        ], 400);
+    }
+
+    /**
+     * Show cart page
+     */
+    public function cart()
+    {
+        $cartItems = $this->cartRepository->getCartItems(auth()->id());
+        $cartSummary = $this->cartRepository->getCartSummary(auth()->id());
+        
+        return view('plugin/multivendor::buyer.v2.pages.cart', compact('cartItems', 'cartSummary'));
     }
 }

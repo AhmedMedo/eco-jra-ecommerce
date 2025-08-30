@@ -263,5 +263,17 @@ Route::group(['prefix' => 'buyer'], function () {
             ->name('plugin.multivendor.buyer.v2.marketplace.delete-filter');
         Route::get('/marketplace/saved-filters', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'getSavedFilters'])
             ->name('plugin.multivendor.buyer.v2.marketplace.saved-filters');
+        
+        // Cart routes
+        Route::get('/cart', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'cart'])
+            ->name('plugin.multivendor.buyer.v2.cart');
+        Route::post('/cart/add', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'addToCart'])
+            ->name('plugin.multivendor.buyer.v2.cart.add');
+        Route::get('/cart/items', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'getCartItems'])
+            ->name('plugin.multivendor.buyer.v2.cart.items');
+        Route::put('/cart/update', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'updateCartItem'])
+            ->name('plugin.multivendor.buyer.v2.cart.update');
+        Route::delete('/cart/remove', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'removeCartItem'])
+            ->name('plugin.multivendor.buyer.v2.cart.remove');
     });
 });

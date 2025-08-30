@@ -88,6 +88,7 @@
                 $items = [
                   ['name' => 'Dashboard', 'href' => route('plugin.multivendor.buyer.v2.dashboard')],
                   ['name' => 'Marketplace', 'href' => route('plugin.multivendor.buyer.v2.marketplace')],
+                  ['name' => 'Cart', 'href' => route('plugin.multivendor.buyer.v2.cart')],
                   ['name' => 'My Request', 'href' => route('plugin.multivendor.buyer.v2.my-request')],
                   ['name' => 'Certificates', 'href' => route('plugin.multivendor.buyer.v2.certificates')],
                   ['name' => 'Settings', 'href' => route('plugin.multivendor.buyer.v2.settings')],
@@ -163,6 +164,14 @@
 {{--                        </div>--}}
 {{--                    </div>--}}
                     
+                    <!-- Shopping Cart -->
+                    <a href="{{ route('plugin.multivendor.buyer.v2.cart') }}" class="relative p-2 text-gray-600 hover:text-gray-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2 8m2-8l2-2m0 0V9a2 2 0 114 0v2.93m-6 0l2 2"/>
+                        </svg>
+                        <span id="cart-counter" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
+                    </a>
+                    
                     <!-- Notification Bell -->
                     <button class="relative p-2 text-gray-600 hover:text-gray-800">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,5 +233,39 @@
 
 @stack('scripts')
 @yield('scripts')
+
+<!-- Cart Counter Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load cart count on page load
+    loadCartCount();
+    
+    function loadCartCount() {
+        fetch('{{ route("plugin.multivendor.buyer.v2.cart.items") }}')
+        .then(response => response.json())
+        .then(data => {
+            updateCartCounter(data.cart_summary);
+        })
+        .catch(error => {
+            console.error('Error loading cart count:', error);
+        });
+    }
+    
+    function updateCartCounter(cartSummary) {
+        const cartCounter = document.getElementById('cart-counter');
+        if (cartCounter && cartSummary) {
+            if (cartSummary.total_items > 0) {
+                cartCounter.textContent = cartSummary.total_items;
+                cartCounter.classList.remove('hidden');
+            } else {
+                cartCounter.classList.add('hidden');
+            }
+        }
+    }
+    
+    // Make updateCartCounter available globally for marketplace
+    window.updateCartCounter = updateCartCounter;
+});
+</script>
 </body>
 </html>
