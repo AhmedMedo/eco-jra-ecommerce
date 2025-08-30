@@ -234,14 +234,34 @@ Route::group(['prefix' => 'buyer'], function () {
         Route::get('/marketplace', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'marketplace'])
             ->name('plugin.multivendor.buyer.v2.marketplace');
         Route::get('/marketplace/project/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'projectDetail'])
-            ->name('plugin.multivendor.buyer.v2.project-detail');
+            ->name('plugin.multivendor.buyer.v2.project-details');
+        Route::get('/my-request', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'myRequest'])
+            ->name('plugin.multivendor.buyer.v2.my-request');
         Route::get('/certificates', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'certificates'])
             ->name('plugin.multivendor.buyer.v2.certificates');
-        Route::get('/reports', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'reports'])
-            ->name('plugin.multivendor.buyer.v2.reports');
         Route::get('/settings', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'settings'])
             ->name('plugin.multivendor.buyer.v2.settings');
         Route::get('/account-review', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'accountReview'])
             ->name('plugin.multivendor.buyer.v2.account-review');
+        
+        // AJAX routes for marketplace operations
+        Route::post('/marketplace/watchlist/add', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'addToWatchlist'])
+            ->name('plugin.multivendor.buyer.v2.watchlist.add');
+        Route::post('/marketplace/watchlist/remove', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'removeFromWatchlist'])
+            ->name('plugin.multivendor.buyer.v2.watchlist.remove');
+        Route::post('/marketplace/search', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'searchProjects'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.search');
+        Route::get('/marketplace/filter-options', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'getFilterOptions'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.filter-options');
+        Route::get('/marketplace/export', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'exportProjects'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.export');
+        Route::post('/marketplace/save-filter', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'saveFilter'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.save-filter');
+        Route::get('/marketplace/load-filter/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'loadFilter'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.load-filter');
+        Route::delete('/marketplace/delete-filter/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'deleteFilter'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.delete-filter');
+        Route::get('/marketplace/saved-filters', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'getSavedFilters'])
+            ->name('plugin.multivendor.buyer.v2.marketplace.saved-filters');
     });
 });

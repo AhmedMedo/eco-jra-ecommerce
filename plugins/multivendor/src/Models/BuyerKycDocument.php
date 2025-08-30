@@ -34,3 +34,6 @@ class BuyerKycDocument extends Model
         return $this->belongsTo(UploadedFile::class, 'file_id');
     }
 }
+
+
+

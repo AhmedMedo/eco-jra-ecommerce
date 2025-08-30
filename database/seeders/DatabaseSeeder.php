@@ -21,5 +21,12 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $superAdmin = new \Core\Models\User();
+        
+        // Seed IREC-related data
+        $this->call([
+            IrecProjectsSeeder::class,
+            IrecProjectCertificationsSeeder::class,
+            IrecProjectImagesSeeder::class,
+        ]);
     }
 }

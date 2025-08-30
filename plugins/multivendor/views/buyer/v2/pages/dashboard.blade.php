@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="flex items-center mt-3">
-                <span class="text-green-600 text-sm font-medium">+12.5%</span>
+                <span class="text-red-600 text-sm font-medium">-12.5%</span>
             </div>
         </div>
 
@@ -77,62 +77,104 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- IREC by Vintage Chart -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Total IREC by Vintage (Year)</h3>
-            <div class="h-64">
-                <canvas id="irecChart"></canvas>
-            </div>
+    <!-- IREC by Vintage Chart - Full Width -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Total IREC by Vintage (Year)</h3>
+        <div class="h-64">
+            <canvas id="irecChart"></canvas>
         </div>
+    </div>
 
-        <!-- Monthly Activity -->
+    <!-- Charts Section - Two Columns -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Monthly Activity Donut Chart -->
         <div class="bg-white rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Statistics</h3>
             </div>
-            <div class="grid grid-cols-1 gap-6">
-                <!-- Monthly Activity Pie Chart -->
-                <div>
-                    <h4 class="text-md font-medium text-gray-700 mb-3">Monthly activity</h4>
-                    <div class="flex items-center justify-center">
-                        <div class="relative w-48 h-48">
-                            <canvas id="monthlyChart"></canvas>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="text-center">
-                                    <p class="text-xl font-bold text-gray-900">47,482.27</p>
-                                    <p class="text-sm text-gray-500">MWh</p>
-                                </div>
-                            </div>
+            <h4 class="text-md font-medium text-gray-700 mb-3">Monthly activity</h4>
+            <div class="flex items-center justify-center">
+                <div class="relative w-48 h-48">
+                    <canvas id="monthlyChart"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center">
+                            <p class="text-xl font-bold text-gray-900">47,482.27</p>
+                            <p class="text-sm text-gray-500">MWh</p>
                         </div>
                     </div>
                 </div>
+            </div>
+            <!-- Legend -->
+            <div class="mt-4 flex items-center justify-center space-x-4 text-xs">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Wind (5,000)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Solar (25,000)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Hydro (30,000)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-teal-500 rounded-full mr-2"></div>
+                    <span class="text-gray-600">Bio (25,000)</span>
+                </div>
+            </div>
+        </div>
 
-                <!-- Total Bid Chart -->
-                <div>
-                    <h4 class="text-md font-medium text-gray-700 mb-3">Total Bid</h4>
-                    <div class="h-32">
-                        <canvas id="bidChart"></canvas>
+        <!-- Status Sections -->
+        <div class="space-y-4">
+            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-green-500">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
-                    <div class="mt-2 flex items-center justify-center space-x-4 text-xs">
-                        <div class="flex items-center">
-                            <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                            <span class="text-gray-600">Approved</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
-                            <span class="text-gray-600">Pending</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                            <span class="text-gray-600">Cancelled</span>
-                        </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-900">Approved</h4>
+                        <p class="text-sm text-gray-600">Total Amount 2,500,000 EGP</p>
+                        <p class="text-sm text-gray-600">Certificates 2,000</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-orange-500">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-900">Pending</h4>
+                        <p class="text-sm text-gray-600">Total Amount 2,500,000 EGP</p>
+                        <p class="text-sm text-gray-600">Certificates 2,000</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-red-500">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-900">Canceled</h4>
+                        <p class="text-sm text-gray-600">Total Amount 2,500,000 EGP</p>
+                        <p class="text-sm text-gray-600">Certificates 2,000</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
 
     <!-- Active Certificates Table -->
     <div class="bg-white rounded-lg shadow-sm">
@@ -181,7 +223,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <span class="w-4 h-4 mr-2 text-green-500">●</span>
-                                <span class="text-sm text-gray-900">Bio</span>
+                                <span class="text-sm text-gray-900">Solar</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
@@ -190,58 +232,88 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Buy</button>
+                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230002</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Zafarana Wind</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 mr-2 text-blue-500">●</span>
+                                <span class="text-sm text-gray-900">Wind</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230003</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gulf of Suez</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 mr-2 text-green-500">●</span>
+                                <span class="text-sm text-gray-900">Hydro</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230004</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">SolarTech Egypt</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="w-4 h-4 mr-2 text-green-500">●</span>
+                                <span class="text-sm text-gray-900">Solar</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-        <div class="space-y-4">
-            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
-                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-500">
+                    Showing per page 10
                 </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">New IREC Certificate Generated</p>
-                    <p class="text-sm text-gray-500">500 MWh added to your portfolio</p>
+                <div class="flex items-center space-x-2">
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">01</button>
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">02</button>
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">03</button>
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">04</button>
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">05</button>
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:text-gray-700">06</button>
                 </div>
-                <span class="text-sm text-gray-400">2 hours ago</span>
-            </div>
-
-            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
-                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">Energy Consumption Updated</p>
-                    <p class="text-sm text-gray-500">Monthly consumption data refreshed</p>
-                </div>
-                <span class="text-sm text-gray-400">1 day ago</span>
-            </div>
-
-            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
-                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900">Portfolio Value Increased</p>
-                    <p class="text-sm text-gray-500">Your portfolio value increased by 8.5%</p>
-                </div>
-                <span class="text-sm text-gray-400">3 days ago</span>
             </div>
         </div>
     </div>
+
 </div>
 @endsection
 
@@ -294,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: ['Wind','Solar','Hydro','Bio'],
                 datasets: [{
                     data: [11,24,26,39],
-                    backgroundColor: ['#14b8a6','#f97316','#3b82f6','#22c55e'],
+                    backgroundColor: ['#3b82f6','#f97316','#22c55e','#14b8a6'],
                     borderWidth: 0
                 }]
             },
@@ -302,30 +374,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Bid multi-line chart
-    const bidCtx = document.getElementById('bidChart');
-    if (bidCtx) {
-        new Chart(bidCtx, {
-            type: 'line',
-            data: {
-                labels: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],
-                datasets: [
-                    { data: [60,55,65,70,75,80,85,80,75,70,75,80], borderColor: '#22c55e', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 },
-                    { data: [40,45,35,50,45,40,35,45,50,55,50,45], borderColor: '#eab308', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 },
-                    { data: [20,25,30,25,20,15,20,25,20,15,20,25], borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, pointRadius: 0 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                    y: { beginAtZero: true, max: 100, ticks: { stepSize: 20, callback: (v) => v + '%', font: { size: 10 } }, grid: { color: '#f3f4f6' } }
-                }
-            }
-        });
-    }
+
 });
 </script>
 @endpush
