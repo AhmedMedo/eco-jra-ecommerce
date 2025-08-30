@@ -275,5 +275,17 @@ Route::group(['prefix' => 'buyer'], function () {
             ->name('plugin.multivendor.buyer.v2.cart.update');
         Route::delete('/cart/remove', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'removeCartItem'])
             ->name('plugin.multivendor.buyer.v2.cart.remove');
+        
+        // Transaction History routes
+        Route::get('/transactions', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'transactionHistory'])
+            ->name('plugin.multivendor.buyer.v2.transactions');
+        Route::get('/transactions/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'transactionDetails'])
+            ->name('plugin.multivendor.buyer.v2.transactions.details');
+        Route::get('/transactions/export/data', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'exportTransactionHistory'])
+            ->name('plugin.multivendor.buyer.v2.transactions.export');
+        Route::get('/transactions/stats/data', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'getTransactionStats'])
+            ->name('plugin.multivendor.buyer.v2.transactions.stats');
+        Route::get('/transactions/search/projects', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'searchTransactions'])
+            ->name('plugin.multivendor.buyer.v2.transactions.search');
     });
 });

@@ -89,6 +89,7 @@
                   ['name' => 'Dashboard', 'href' => route('plugin.multivendor.buyer.v2.dashboard')],
                   ['name' => 'Marketplace', 'href' => route('plugin.multivendor.buyer.v2.marketplace')],
                   ['name' => 'Cart', 'href' => route('plugin.multivendor.buyer.v2.cart')],
+                  ['name' => 'Transactions', 'href' => route('plugin.multivendor.buyer.v2.transactions')],
                   ['name' => 'My Request', 'href' => route('plugin.multivendor.buyer.v2.my-request')],
                   ['name' => 'Certificates', 'href' => route('plugin.multivendor.buyer.v2.certificates')],
                   ['name' => 'Settings', 'href' => route('plugin.multivendor.buyer.v2.settings')],
