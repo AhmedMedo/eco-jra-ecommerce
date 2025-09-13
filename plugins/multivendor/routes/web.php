@@ -67,6 +67,21 @@ Route::group(['prefix' => getAdminPrefix(), 'middleware' => 'auth'], function ()
         Route::get('/seller-settings', [SettingsController::class, 'sellerSettings'])->name('plugin.multivendor.admin.seller.settings');
         Route::post('/update-seller-settings', [SettingsController::class, 'sellerSettingsUpdate'])->name('plugin.multivendor.admin.seller.settings.update')->middleware('demo');
     });
+
+    /**
+     * IREC Payment Management
+     */
+    Route::middleware(['vhost', 'can:Manage IREC Payments'])->group(function () {
+        Route::get('/irec-payments', function() {
+            return view('plugin/multivendor::admin.payments.index');
+        })->name('plugin.multivendor.admin.irec.payments.page');
+        Route::get('/irec-payments/data', [\Plugin\Multivendor\Http\Controllers\Admin\PaymentController::class, 'getAllPayments'])->name('plugin.multivendor.admin.irec.payments.list');
+        Route::get('/irec-payments/pending', [\Plugin\Multivendor\Http\Controllers\Admin\PaymentController::class, 'getPendingPayments'])->name('plugin.multivendor.admin.irec.payments.pending');
+        Route::get('/irec-payments/{id}', [\Plugin\Multivendor\Http\Controllers\Admin\PaymentController::class, 'getPaymentDetails'])->name('plugin.multivendor.admin.irec.payments.details');
+        Route::post('/irec-payments/{id}/approve', [\Plugin\Multivendor\Http\Controllers\Admin\PaymentController::class, 'approvePayment'])->name('plugin.multivendor.admin.irec.payments.approve')->middleware('demo');
+        Route::post('/irec-payments/{id}/reject', [\Plugin\Multivendor\Http\Controllers\Admin\PaymentController::class, 'rejectPayment'])->name('plugin.multivendor.admin.irec.payments.reject')->middleware('demo');
+        Route::get('/irec-payments/stats/data', [\Plugin\Multivendor\Http\Controllers\Admin\PaymentController::class, 'getPaymentStats'])->name('plugin.multivendor.admin.irec.payments.stats');
+    });
 });
 
 
@@ -287,5 +302,13 @@ Route::group(['prefix' => 'buyer'], function () {
             ->name('plugin.multivendor.buyer.v2.transactions.stats');
         Route::get('/transactions/search/projects', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'searchTransactions'])
             ->name('plugin.multivendor.buyer.v2.transactions.search');
+        
+        // Payment routes
+        Route::post('/checkout/process', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PaymentController::class, 'processCheckout'])
+            ->name('plugin.multivendor.buyer.v2.checkout.process');
+        Route::get('/payments/history', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PaymentController::class, 'getPaymentHistory'])
+            ->name('plugin.multivendor.buyer.v2.payments.history');
+        Route::get('/payments/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PaymentController::class, 'getPaymentDetails'])
+            ->name('plugin.multivendor.buyer.v2.payments.details');
     });
 });

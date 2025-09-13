@@ -129,7 +129,7 @@
                         </div>
                         
                         <!-- Checkout Button -->
-                        <button class="w-full mt-6 bg-[#167070] text-white py-3 px-4 rounded-lg hover:bg-[#0f5050] transition-colors duration-200 font-medium">
+                        <button id="checkoutBtn" class="w-full mt-6 bg-[#167070] text-white py-3 px-4 rounded-lg hover:bg-[#0f5050] transition-colors duration-200 font-medium">
                             Proceed to Checkout
                         </button>
                         
@@ -195,11 +195,220 @@
         </div>
     </div>
 </div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Payment Information</h3>
+                <button id="closePaymentModal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="mt-6">
+                <form id="paymentForm" enctype="multipart/form-data">
+                    @csrf
+                    
+                    <!-- Bank Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label for="bank_name" class="block text-sm font-medium text-gray-700 mb-2">Bank Name *</label>
+                            <input type="text" 
+                                   id="bank_name" 
+                                   name="bank_name" 
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#167070] focus:border-[#167070]"
+                                   placeholder="Enter bank name">
+                        </div>
+                        
+                        <div>
+                            <label for="iban" class="block text-sm font-medium text-gray-700 mb-2">IBAN *</label>
+                            <input type="text" 
+                                   id="iban" 
+                                   name="iban" 
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#167070] focus:border-[#167070]"
+                                   placeholder="Enter IBAN">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label for="account_number" class="block text-sm font-medium text-gray-700 mb-2">Account Number *</label>
+                            <input type="text" 
+                                   id="account_number" 
+                                   name="account_number" 
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#167070] focus:border-[#167070]"
+                                   placeholder="Enter account number">
+                        </div>
+                        
+                        <div>
+                            <label for="account_holder_name" class="block text-sm font-medium text-gray-700 mb-2">Account Holder Name *</label>
+                            <input type="text" 
+                                   id="account_holder_name" 
+                                   name="account_holder_name" 
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#167070] focus:border-[#167070]"
+                                   placeholder="Enter account holder name">
+                        </div>
+                    </div>
+                    
+                    <!-- Receipt Upload -->
+                    <div class="mb-6">
+                        <label for="receipt" class="block text-sm font-medium text-gray-700 mb-2">Payment Receipt (Optional)</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="receipt" class="relative cursor-pointer bg-white rounded-md font-medium text-[#167070] hover:text-[#0f5050] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#167070]">
+                                        <span>Upload a file</span>
+                                        <input id="receipt" name="receipt" type="file" class="sr-only" accept=".jpg,.jpeg,.png,.pdf">
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, PDF up to 5MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary in Modal -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h4 class="text-sm font-medium text-gray-900 mb-3">Order Summary</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Items ({{ $cartSummary['total_items'] }})</span>
+                                <span class="font-medium">{{ $cartSummary['formatted_total'] }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Quantity</span>
+                                <span class="font-medium">{{ number_format($cartSummary['total_quantity'], 2) }} MWh</span>
+                            </div>
+                            <div class="border-t border-gray-200 pt-2">
+                                <div class="flex justify-between">
+                                    <span class="font-semibold text-gray-900">Total</span>
+                                    <span class="font-bold text-gray-900">{{ $cartSummary['formatted_total'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" 
+                                id="cancelPayment" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#167070]">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                id="submitPayment" 
+                                class="px-6 py-2 bg-[#167070] text-white rounded-md text-sm font-medium hover:bg-[#0f5050] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#167070] disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span id="submitText">Submit Payment</span>
+                            <span id="submitLoading" class="hidden">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Payment Modal Functions
+    const paymentModal = document.getElementById('paymentModal');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const closePaymentModal = document.getElementById('closePaymentModal');
+    const cancelPayment = document.getElementById('cancelPayment');
+    const paymentForm = document.getElementById('paymentForm');
+    const submitPayment = document.getElementById('submitPayment');
+    const submitText = document.getElementById('submitText');
+    const submitLoading = document.getElementById('submitLoading');
+
+    // Open payment modal
+    checkoutBtn.addEventListener('click', function() {
+        paymentModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close payment modal
+    function closeModal() {
+        paymentModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        paymentForm.reset();
+    }
+
+    closePaymentModal.addEventListener('click', closeModal);
+    cancelPayment.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside
+    paymentModal.addEventListener('click', function(e) {
+        if (e.target === paymentModal) {
+            closeModal();
+        }
+    });
+
+    // Handle form submission
+    paymentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        submitPayment.disabled = true;
+        submitText.classList.add('hidden');
+        submitLoading.classList.remove('hidden');
+
+        // Create FormData
+        const formData = new FormData(paymentForm);
+
+        // Submit payment
+        fetch('{{ route("plugin.multivendor.buyer.v2.checkout.process") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Payment submitted successfully! Your transaction is pending review.', 'success');
+                closeModal();
+                // Redirect to transactions page or show success message
+                setTimeout(() => {
+                    window.location.href = '{{ route("plugin.multivendor.buyer.v2.transactions") }}';
+                }, 2000);
+            } else {
+                showToast(data.message || 'Failed to submit payment', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred while submitting payment', 'error');
+        })
+        .finally(() => {
+            // Reset button state
+            submitPayment.disabled = false;
+            submitText.classList.remove('hidden');
+            submitLoading.classList.add('hidden');
+        });
+    });
+
     // Toast Notification Functions
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toastNotification');

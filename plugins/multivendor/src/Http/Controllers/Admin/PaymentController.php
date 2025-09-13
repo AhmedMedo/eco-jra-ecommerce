@@ -2,86 +2,165 @@
 
 namespace Plugin\Multivendor\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Plugin\Multivendor\Repositories\SellerEarningRepository;
+use Illuminate\Http\Request;
+use Plugin\Multivendor\Repositories\IrecPaymentRepository;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
+    protected $paymentRepository;
 
-    public function __construct(public SellerEarningRepository $sellerEarningRepository)
+    public function __construct(IrecPaymentRepository $paymentRepository)
     {
-        isActiveParentPlugin('ecommerce');
-    }
-
-    /**
-     * Will return payout requests
-     * 
-     * @param \Illuminate\Http\Request $request
-     */
-    public function payoutRequest(Request $request)
-    {
-        $payout_requests = $this->sellerEarningRepository->allPayoutRequests($request);
-        return view('plugin/multivendor::admin.earning.seller_payout_requests', ['payout_requests' => $payout_requests]);
-    }
-    /**
-     * Will return payouts
-     * 
-     * @param \Illuminate\Http\Request $request
-     */
-    public function payouts(Request $request)
-    {
-        $payouts = $this->sellerEarningRepository->allPayouts($request);
-        return view('plugin/multivendor::admin.earning.seller_payouts', ['payouts' => $payouts]);
+        $this->paymentRepository = $paymentRepository;
     }
 
     /**
-     * Will return seller earnings history
-     * 
-     * @param \Illuminate\Http\Request $request
+     * Get all pending payments for admin review
      */
-    public function sellerEarnings(Request $request)
+    public function getPendingPayments()
     {
-        $earnings = $this->sellerEarningRepository->sellerEarningHistory($request);
-        return view('plugin/multivendor::admin.earning.history', ['earnings' => $earnings]);
-    }
-    /**
-     * Will return seller payout request details
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return JsonResponse
-     */
-    public function payoutRequestDetails(Request $request)
-    {
-        $request_details = $this->sellerEarningRepository->payoutRequestDetails($request['id']);
+        $payments = $this->paymentRepository->getPendingPayments();
 
-        return response()->json(
-            [
-                'success' => true,
-                'data' => view('plugin/multivendor::admin.earning.seller_payout_requests_details', ['request_details' => $request_details])->render()
-            ]
-        );
+        return response()->json([
+            'success' => true,
+            'payments' => $payments
+        ]);
     }
+
     /**
-     * Will update payout request status
-     * 
+     * Get payment details for review
      */
-    public function updatePayoutRequestStatus(Request $request)
+    public function getPaymentDetails($paymentId)
     {
-        $res = $this->sellerEarningRepository->updatePayoutRequestDetails($request);
-        if ($res) {
-            return response()->json(
-                [
-                    'success' => true,
-                ]
-            );
-        } else {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => translate('Payout status update failed')
-                ]
-            );
+        $payment = $this->paymentRepository->getPayment($paymentId);
+
+        if (!$payment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment not found'
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'payment' => $payment
+        ]);
+    }
+
+    /**
+     * Approve a payment
+     */
+    public function approvePayment(Request $request, $paymentId)
+    {
+        $validator = Validator::make($request->all(), [
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $result = $this->paymentRepository->updatePaymentStatus(
+            $paymentId,
+            'approved',
+            auth()->id(),
+            $request->notes
+        );
+
+        if ($result) {
+            // Update the related transaction status to completed
+            $payment = $this->paymentRepository->getPayment($paymentId);
+            if ($payment && $payment->transaction) {
+                $payment->transaction->update(['transaction_status' => 'completed']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment approved successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to approve payment'
+        ], 500);
+    }
+
+    /**
+     * Reject a payment
+     */
+    public function rejectPayment(Request $request, $paymentId)
+    {
+        $validator = Validator::make($request->all(), [
+            'notes' => 'required|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $result = $this->paymentRepository->updatePaymentStatus(
+            $paymentId,
+            'rejected',
+            auth()->id(),
+            $request->notes
+        );
+
+        if ($result) {
+            // Update the related transaction status to cancelled
+            $payment = $this->paymentRepository->getPayment($paymentId);
+            if ($payment && $payment->transaction) {
+                $payment->transaction->update(['transaction_status' => 'cancelled']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment rejected successfully'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to reject payment'
+        ], 500);
+    }
+
+    /**
+     * Get payment statistics for admin dashboard
+     */
+    public function getPaymentStats()
+    {
+        $stats = $this->paymentRepository->getPaymentStats();
+
+        return response()->json([
+            'success' => true,
+            'stats' => $stats
+        ]);
+    }
+
+    /**
+     * Get all payments with filters
+     */
+    public function getAllPayments(Request $request)
+    {
+        $status = $request->get('status');
+        $payments = $status ? 
+            $this->paymentRepository->getPaymentsByStatus($status) : 
+            $this->paymentRepository->getPendingPayments();
+
+        return response()->json([
+            'success' => true,
+            'payments' => $payments
+        ]);
     }
 }
