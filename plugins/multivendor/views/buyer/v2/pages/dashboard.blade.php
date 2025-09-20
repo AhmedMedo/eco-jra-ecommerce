@@ -216,82 +216,74 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($completedTransactions as $transaction)
                     <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230001</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Benban Solar Park</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">
+                            {{ $transaction->project->project_id ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $transaction->project->project_name ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ $transaction->project->country ?? 'N/A' }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <span class="w-4 h-4 mr-2 text-green-500">●</span>
-                                <span class="text-sm text-gray-900">Solar</span>
+                                @php
+                                    $energyType = strtolower($transaction->project->energy_type ?? 'solar');
+                                    $colorClass = match($energyType) {
+                                        'wind' => 'text-blue-500',
+                                        'hydro' => 'text-green-500',
+                                        'bio' => 'text-orange-500',
+                                        default => 'text-green-500'
+                                    };
+                                @endphp
+                                <span class="w-4 h-4 mr-2 {{ $colorClass }}">●</span>
+                                <span class="text-sm text-gray-900">{{ ucfirst($energyType) }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ number_format($transaction->quantity_mwh, 2) }} MWh
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            @if($transaction->quantity_mwh > 0)
+                                {{ number_format(($transaction->total_redeemed / $transaction->quantity_mwh) * 100, 0) }}%
+                            @else
+                                0%
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ $transaction->project->vintage_year ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            EGP {{ number_format($transaction->total_amount, 2) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            EGP {{ number_format($transaction->price_per_mwh, 2) }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
+                            @if($transaction->canBeRedeemed())
+                                <button class="redeem-btn bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200"
+                                        data-transaction-id="{{ $transaction->id }}">
+                                    Redeem
+                                </button>
+                            @elseif($transaction->total_redeemed > 0)
+                                <button class="view-history-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors duration-200"
+                                        data-transaction-id="{{ $transaction->id }}">
+                                    View History
+                                </button>
+                            @else
+                                <span class="text-gray-400 text-sm">No redemptions</span>
+                            @endif
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230002</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Zafarana Wind</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <span class="w-4 h-4 mr-2 text-blue-500">●</span>
-                                <span class="text-sm text-gray-900">Wind</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
+                    @empty
+                    <tr>
+                        <td colspan="10" class="px-6 py-4 text-center text-gray-500">
+                            No completed transactions found.
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230003</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Gulf of Suez</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <span class="w-4 h-4 mr-2 text-green-500">●</span>
-                                <span class="text-sm text-gray-900">Hydro</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-teal">IREC-20230004</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">SolarTech Egypt</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Egypt</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <span class="w-4 h-4 mr-2 text-green-500">●</span>
-                                <span class="text-sm text-gray-900">Solar</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1500 MWh</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80%</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 42500</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">EGP 45.2</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <button class="bg-primary-teal text-white px-3 py-1 rounded text-sm hover:bg-primary-teal-dark transition-colors duration-200">Redeem</button>
-                        </td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -374,6 +366,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Handle redeem button clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('redeem-btn')) {
+            const transactionId = e.target.getAttribute('data-transaction-id');
+            // Redirect to transaction details page for redemption
+            window.location.href = `/buyer/transactions/${transactionId}`;
+        }
+        
+        if (e.target.classList.contains('view-history-btn')) {
+            const transactionId = e.target.getAttribute('data-transaction-id');
+            // Redirect to transaction details page to view history
+            window.location.href = `/buyer/transactions/${transactionId}`;
+        }
+    });
 
 });
 </script>

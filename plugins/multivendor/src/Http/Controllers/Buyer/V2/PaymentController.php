@@ -72,7 +72,7 @@ class PaymentController extends Controller
                     'project_id' => $item->project_id,
                     'quantity_mwh' => $item->quantity_mwh,
                     'price_per_mwh' => $item->price_per_mwh,
-                    'total_amount' => $item->quantity_mwh * $item->price_per_mwh,
+                    'total_amount' => $item->total_amount, // Use the already calculated total from cart item
                 ];
             })->toArray();
 
@@ -145,3 +145,4 @@ class PaymentController extends Controller
         ]);
     }
 }
+

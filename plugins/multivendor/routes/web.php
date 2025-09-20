@@ -256,6 +256,12 @@ Route::group(['prefix' => 'buyer'], function () {
             ->name('plugin.multivendor.buyer.v2.certificates');
         Route::get('/settings', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'settings'])
             ->name('plugin.multivendor.buyer.v2.settings');
+        Route::put('/profile/update', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'updateProfile'])
+            ->name('plugin.multivendor.buyer.v2.profile.update');
+        Route::post('/kyc/upload', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'uploadKycDocuments'])
+            ->name('plugin.multivendor.buyer.v2.kyc.upload');
+        Route::put('/kyc/{documentId}/replace', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'replaceKycDocument'])
+            ->name('plugin.multivendor.buyer.v2.kyc.replace');
         Route::get('/account-review', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PageController::class, 'accountReview'])
             ->name('plugin.multivendor.buyer.v2.account-review');
         
@@ -310,5 +316,19 @@ Route::group(['prefix' => 'buyer'], function () {
             ->name('plugin.multivendor.buyer.v2.payments.history');
         Route::get('/payments/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\PaymentController::class, 'getPaymentDetails'])
             ->name('plugin.multivendor.buyer.v2.payments.details');
+        
+        // Redemption routes
+        Route::get('/transactions/{transactionId}/redemption/form', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\RedemptionController::class, 'showRedemptionForm'])
+            ->name('plugin.multivendor.buyer.v2.redemption.form');
+        Route::post('/transactions/{transactionId}/redemption/process', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\RedemptionController::class, 'processRedemption'])
+            ->name('plugin.multivendor.buyer.v2.redemption.process');
+        Route::get('/redemptions/history', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\RedemptionController::class, 'getRedemptionHistory'])
+            ->name('plugin.multivendor.buyer.v2.redemptions.history');
+        Route::get('/transactions/{transactionId}/redemptions', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\RedemptionController::class, 'getTransactionRedemptions'])
+            ->name('plugin.multivendor.buyer.v2.transaction.redemptions');
+        Route::get('/redemptions/{id}', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\RedemptionController::class, 'getRedemptionDetails'])
+            ->name('plugin.multivendor.buyer.v2.redemptions.details');
+        Route::get('/transactions/{transactionId}/redemption/check', [\Plugin\Multivendor\Http\Controllers\Buyer\V2\RedemptionController::class, 'checkRedemptionPossibility'])
+            ->name('plugin.multivendor.buyer.v2.redemption.check');
     });
 });

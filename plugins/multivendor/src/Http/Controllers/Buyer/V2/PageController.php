@@ -26,10 +26,10 @@ class PageController extends Controller
 
     public function dashboard()
     {
-        // Get recent IREC projects for buyer dashboard
-        $recentProjects = $this->irecRepository->getProjectsForBuyerDashboard(auth()->id(), 5);
+        // Get completed transactions for buyer dashboard
+        $completedTransactions = $this->transactionRepository->getBuyerCompletedTransactions(auth()->id());
         
-        return view('plugin/multivendor::buyer.v2.pages.dashboard', compact('recentProjects'));
+        return view('plugin/multivendor::buyer.v2.pages.dashboard', compact('completedTransactions'));
     }
 
     public function marketplace(Request $request)
@@ -101,7 +101,145 @@ class PageController extends Controller
 
     public function settings()
     {
-        return view('plugin/multivendor::buyer.v2.pages.settings');
+        $user = auth()->user();
+        $kycDocuments = \Plugin\Multivendor\Models\BuyerKycDocument::where('user_id', $user->id)
+            ->with('file')
+            ->get();
+            
+        return view('plugin/multivendor::buyer.v2.pages.settings', compact('user', 'kycDocuments'));
+    }
+
+    /**
+     * Update buyer profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'company_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'vat_number' => 'nullable|string|max:100',
+        ]);
+
+        try {
+            $user->update([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'company_name' => $validated['company_name'],
+                'phone' => $validated['phone'],
+                'vat_number' => $validated['vat_number'],
+            ]);
+
+            return redirect()->back()->with('success', 'Profile updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update profile. Please try again.');
+        }
+    }
+
+    /**
+     * Upload new KYC documents
+     */
+    public function uploadKycDocuments(Request $request)
+    {
+        $user = auth()->user();
+        
+        $validated = $request->validate([
+            'kyc_files.*' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240', // 10MB max
+        ]);
+
+        try {
+            \DB::beginTransaction();
+
+            foreach ($request->file('kyc_files') as $file) {
+                if ($file->isValid()) {
+                    // Use the existing file upload system
+                    $file_id = \saveFileInStorage($file, 'buyer-kyc');
+                    
+                    if ($file_id) {
+                        // Create KYC document record
+                        \Plugin\Multivendor\Models\BuyerKycDocument::create([
+                            'user_id' => $user->id,
+                            'file_id' => $file_id,
+                            'document_type' => $this->detectDocumentType($file),
+                            'status' => 'pending'
+                        ]);
+                    }
+                }
+            }
+
+            \DB::commit();
+
+            return redirect()->back()->with('success', 'Documents uploaded successfully! They will be reviewed by our team.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to upload documents. Please try again.');
+        }
+    }
+
+    /**
+     * Replace existing KYC document
+     */
+    public function replaceKycDocument(Request $request, $documentId)
+    {
+        $user = auth()->user();
+        
+        $validated = $request->validate([
+            'kyc_file' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240', // 10MB max
+        ]);
+
+        try {
+            $document = \Plugin\Multivendor\Models\BuyerKycDocument::where('id', $documentId)
+                ->where('user_id', $user->id)
+                ->firstOrFail();
+
+            \DB::beginTransaction();
+
+            $file = $request->file('kyc_file');
+            if ($file->isValid()) {
+                // Use the existing file upload system
+                $file_id = \saveFileInStorage($file, 'buyer-kyc');
+                
+                if ($file_id) {
+                    // Update the document with new file
+                    $document->update([
+                        'file_id' => $file_id,
+                        'document_type' => $this->detectDocumentType($file),
+                        'status' => 'pending' // Reset status to pending for review
+                    ]);
+                }
+            }
+
+            \DB::commit();
+
+            return redirect()->back()->with('success', 'Document replaced successfully! It will be reviewed by our team.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to replace document. Please try again.');
+        }
+    }
+
+    /**
+     * Detect document type based on file name or content
+     */
+    private function detectDocumentType($file)
+    {
+        $filename = strtolower($file->getClientOriginalName());
+        
+        if (strpos($filename, 'license') !== false || strpos($filename, 'business') !== false) {
+            return 'business_license';
+        } elseif (strpos($filename, 'id') !== false || strpos($filename, 'identity') !== false) {
+            return 'id_card';
+        } elseif (strpos($filename, 'passport') !== false) {
+            return 'passport';
+        } elseif (strpos($filename, 'tax') !== false || strpos($filename, 'vat') !== false) {
+            return 'tax_certificate';
+        } else {
+            return 'other';
+        }
     }
 
     // ==================== AJAX METHODS ====================

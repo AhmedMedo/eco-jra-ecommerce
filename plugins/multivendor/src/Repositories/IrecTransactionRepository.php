@@ -202,4 +202,16 @@ class IrecTransactionRepository
 
         return $transactions;
     }
+
+    /**
+     * Get completed transactions for buyer dashboard
+     */
+    public function getBuyerCompletedTransactions(int $buyerId): Collection
+    {
+        return IrecProjectTransaction::with(['project'])
+            ->where('buyer_id', $buyerId)
+            ->where('transaction_status', 'completed')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
 }
